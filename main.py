@@ -77,5 +77,3 @@ df["Points"] = df.apply(lambda x: np.count_nonzero(x[1:]) * 200, axis = 1)
 
 print("Total Users:", numberUsers)
 print("Total Points Achieved:", df["Points"].sum())
-
-print(1)
