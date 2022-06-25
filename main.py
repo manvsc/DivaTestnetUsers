@@ -22,58 +22,48 @@ def extend_DataFrame(df, resp):
 
 
 network = "ropsten"
-i=0
-query = """
-{
-  testnetUsers(first: 1000) {
-    id
-    binaryPoolCreated
-    linearPoolCreated
-    convexPoolCreated
-    concavePoolCreated
-    liquidityAdded
-    liquidityRemoved
-    finalValueReported
-    reportedValueChallenged
-    positionTokenRedeemed
-    feesClaimed
-    feeClaimsTransferred
-  }
-}"""
 
-resp = run_query(query, network)
+def query(i):
+    return """
+    {
+      testnetUsers(first: 1000, skip: %s) {
+      id
+      binaryPoolCreated
+      linearPoolCreated
+      convexPoolCreated
+      concavePoolCreated
+      liquidityAdded
+      liquidityRemoved
+      buyLimitOrderCreatedAndFilled
+      sellLimitOrderCreatedAndFilled
+      buyLimitOrderFilled
+      sellLimitOrderFilled
+      finalValueReported
+      reportedValueChallenged
+      positionTokenRedeemed
+      feesClaimed
+      feeClaimsTransferred
+      }
+    }""" % (i * 1000)
+
+
+resp = run_query(query(0), network)
 df = pd.json_normalize(resp, ["data", "testnetUsers"])
 numberUsers = 0
 
-while True:
+for i in range(1,6):
     if numberUsers == df.shape[0]:
         break
     numberUsers = df.shape[0]
-    i=i+1
-    query = """
-    {
-      testnetUsers(first: 1000, skip: %s) {
-        id
-        binaryPoolCreated
-        linearPoolCreated
-        convexPoolCreated
-        concavePoolCreated
-        liquidityAdded
-        liquidityRemoved
-        finalValueReported
-        reportedValueChallenged
-        positionTokenRedeemed
-        feesClaimed
-        feeClaimsTransferred
-      }
-    }"""% (i*1000)
-    resp = run_query(query, network)
+    resp = run_query(query(i), network)
     df = extend_DataFrame(df,resp)
 
 
 df["Points"] = df.apply(lambda x: np.count_nonzero(x[1:]) * 200, axis = 1)
+df["Points"] = df["Points"].apply(lambda x: x * 1.5 if x == 3000 else x)
 
 
 
 print("Total Users:", numberUsers)
-print("Total Points Achieved:", df["Points"].sum())
+print("Total Points Achieved:", int(df["Points"].sum()))
+print("Total Users Achieving 4500 Points: ", df["Points"].value_counts()[4500])
