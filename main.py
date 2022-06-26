@@ -1,6 +1,7 @@
 import requests
 import pandas as pd
 import numpy as np
+import json
 
 
 
@@ -23,10 +24,10 @@ def extend_DataFrame(df, resp):
 
 network = "ropsten"
 
-def query(i):
+def query(lastId):
     return """
     {
-      testnetUsers(first: 1000, skip: %s) {
+      testnetUsers(first: 1000, where: {id_gt: %s}) {
       id
       binaryPoolCreated
       linearPoolCreated
@@ -44,19 +45,20 @@ def query(i):
       feesClaimed
       feeClaimsTransferred
       }
-    }""" % (i * 1000)
+    }""" % lastId
 
 
 resp = run_query(query(0), network)
 df = pd.json_normalize(resp, ["data", "testnetUsers"])
 numberUsers = 0
 
-for i in range(1,6):
+while True:
+    lastId = json.dumps(df.id.iloc[-1])
     if numberUsers == df.shape[0]:
         break
     numberUsers = df.shape[0]
-    resp = run_query(query(i), network)
-    df = extend_DataFrame(df,resp)
+    resp = run_query(query(lastId), network)
+    df = extend_DataFrame(df, resp)
 
 
 df["Points"] = df.apply(lambda x: np.count_nonzero(x[1:]) * 200, axis = 1)

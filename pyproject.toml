@@ -1,14 +1,15 @@
 [tool.poetry]
-name = "TestnetUsers"
+name = "DivaTestnetUsers"
 version = "0.1.0"
 description = ""
-authors = ["manvsc <manvir.schneider@gmx.de>"]
+authors = ["manvsc <79197645+manvsc@users.noreply.github.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
 requests = "^2.28.0"
-pandas = "^1.4.2"
+pandas = "^1.4.3"
 numpy = "^1.23.0"
+json2 = "^0.4.0"
 
 [tool.poetry.dev-dependencies]
 
