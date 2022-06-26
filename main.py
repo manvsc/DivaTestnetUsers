@@ -2,7 +2,7 @@ import requests
 import pandas as pd
 import numpy as np
 import json
-
+from openpyxl.workbook import Workbook
 
 
 # function to use requests.post to make an API call to the subgraph url
@@ -65,6 +65,8 @@ df["Points"] = df.apply(lambda x: np.count_nonzero(x[1:]) * 200, axis = 1)
 df["Points"] = df["Points"].apply(lambda x: x * 1.5 if x == 3000 else x)
 
 
+df.to_csv('TestnetPoints.csv', index=False)
+df.to_excel('TestnetPoints.xlsx', index=False)
 
 print("Total Users:", numberUsers)
 print("Total Points Achieved:", int(df["Points"].sum()))
